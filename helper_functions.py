@@ -310,7 +310,9 @@ def view_random_multiple_images(target_dir, class_names, image_count=4):
     ax[i].set_title(target_class)
     ax[i].axis("off")
 
- # Let's make a create_model function to create a model from a URL
+import tensorflow as tf
+import tensorflow_hub as hub
+from tensorflow.keras import layers
 def create_tf_model_from_url(model_url, num_classes=10):
   """
   Takes a tensorflow hub Url and creates a Keras Sequential model with it.
