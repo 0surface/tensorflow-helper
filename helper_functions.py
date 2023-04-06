@@ -333,3 +333,26 @@ def compare_historys(original_history, new_history, initial_epochs=5):
   plt.title('Training and Validation Loss')
   plt.xlabel('epoch')
   plt.show()
+  
+  
+import random
+def view_random_multiple_images(target_dir, class_names, image_count=4): 
+  fig, ax = plt.subplots(1,image_count, figsize=(18,12))
+
+  for i in range(0,image_count):
+    if(len(class_names) > 1):
+      target_class =  random.choice(class_names)
+    else:
+      target_class=class_names[0]
+
+    # Set up the target directory(we'll view images from here)
+    target_folder = target_dir + target_class
+
+    # Get a random image path
+    random_image = random.sample(os.listdir(target_folder), 1)    
+
+    # Read in the image and plot it using matplotlib
+    img = mpimg.imread(target_folder + "/" + random_image[0])    
+    ax[i].imshow(img)    
+    ax[i].set_title(target_class)
+    ax[i].axis("off")
