@@ -310,30 +310,3 @@ def view_random_multiple_images(target_dir, class_names, image_count=4):
     ax[i].set_title(target_class)
     ax[i].axis("off")
 
-import tensorflow as tf
-import tensorflow_hub as hub
-from tensorflow.keras import layers
-def create_tf_model_from_url(model_url, num_classes=10):
-  """
-  Takes a tensorflow hub Url and creates a Keras Sequential model with it.
-  
-    model_url (str): A TensorFlow Hub feature extraction URL.
-    num_classes (int): Number of output neurons in the output layer, 
-        should be equal to number of target classes, default 10.
-
-        Returns:
-          An uncompiled Keras Sequential model with model_url as feature extractor layer and 
-          and Denseouput layer with num_classes output neurons.
-  """
-  # Download the pretrained model and save it as a Keras layer
-  feature_extractor_layer = hub.KerasLayer(model_url,
-                                          trainable=False,
-                                          name="feature_extrator_layer",
-                                          input_shape = IMAGE_SHAPE+(3,))  # freeze the already learned patterns
-  # Crate our own model
-  model = tf.keras.Sequential([
-      feature_extractor_layer,
-      layers.Dense(num_classes, activation="softmax", name="output_layer")
-  ])
-
-  return model
