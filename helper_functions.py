@@ -287,53 +287,6 @@ def calculate_results(y_true, y_pred):
                   "f1": model_f1}
   return model_results
 
-# Let's create a function to compare training histories
-def compare_historys(original_history, new_history, initial_epochs=5):
-  """
-  Compares two TensorFlow History objects
-  
-    Args: 
-      original_history (tf.keras.callbacks.History) Tensor flow history callback object
-      new_history (tf.keras.callbacks.History) Tensor flow history callback object
-    
-    Reutrns: 
-      A plot of the original and new histories accuracy and loss curve plots
-  """
-  # Get original histroy measurements
-  acc = original_history.history["accuracy"]
-  loss = original_history.history["loss"]
-
-  val_acc = original_history.history["val_accuracy"]
-  val_loss = original_history.history["val_loss"]
-
-  # Combine original history metrics with new_history metrics
-  total_acc = acc  + new_history.history["accuracy"]
-  total_loss = loss + new_history.history["loss"]
-
-  total_val_acc = val_acc  + new_history.history["val_accuracy"]
-  total_val_loss = val_loss + new_history.history["val_loss"]
-
-  # Make plots for accuracy
-  plt.figure(figsize=(8, 8))
-  plt.subplot(2, 1, 1)
-  plt.plot(total_acc, label='Training Accuracy')
-  plt.plot(total_val_acc, label='Validation Accuracy')
-  plt.plot([initial_epochs-1, initial_epochs-1],
-            plt.ylim(), label='Start Fine Tuning') # reshift plot around epochs
-  plt.legend(loc='lower right')
-  plt.title('Training and Validation Accuracy')
-
-  # Make plots for loss
-  plt.subplot(2, 1, 2)
-  plt.plot(total_loss, label='Training Loss')
-  plt.plot(total_val_loss, label='Validation Loss')
-  plt.plot([initial_epochs-1, initial_epochs-1],
-            plt.ylim(), label='Start Fine Tuning') # reshift plot around epochs
-  plt.legend(loc='upper right')
-  plt.title('Training and Validation Loss')
-  plt.xlabel('epoch')
-  plt.show()
-  
   
 import random
 def view_random_multiple_images(target_dir, class_names, image_count=4): 
@@ -356,3 +309,29 @@ def view_random_multiple_images(target_dir, class_names, image_count=4):
     ax[i].imshow(img)    
     ax[i].set_title(target_class)
     ax[i].axis("off")
+
+ # Let's make a create_model function to create a model from a URL
+def create_tf_model_from_url(model_url, num_classes=10):
+  """
+  Takes a tensorflow hub Url and creates a Keras Sequential model with it.
+  
+    model_url (str): A TensorFlow Hub feature extraction URL.
+    num_classes (int): Number of output neurons in the output layer, 
+        should be equal to number of target classes, default 10.
+
+        Returns:
+          An uncompiled Keras Sequential model with model_url as feature extractor layer and 
+          and Denseouput layer with num_classes output neurons.
+  """
+  # Download the pretrained model and save it as a Keras layer
+  feature_extractor_layer = hub.KerasLayer(model_url,
+                                          trainable=False,
+                                          name="feature_extrator_layer",
+                                          input_shape = IMAGE_SHAPE+(3,))  # freeze the already learned patterns
+  # Crate our own model
+  model = tf.keras.Sequential([
+      feature_extractor_layer,
+      layers.Dense(num_classes, activation="softmax", name="output_layer")
+  ])
+
+  return model
