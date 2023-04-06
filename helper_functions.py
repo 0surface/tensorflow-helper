@@ -310,3 +310,53 @@ def view_random_multiple_images(target_dir, class_names, image_count=4):
     ax[i].set_title(target_class)
     ax[i].axis("off")
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+def choose_and_predict_random_images(img_dir, model, img_size=224, batch_size=32):
+  """
+  Displays model label predicitons of 9 images from an image directoty
+
+  Args:
+    img_dir (str)         : An image directory containing images
+    model (tf.keras.model): A TensorFlow model
+    image_size (int32)    : The image size the model is trained on (default 224)
+    batch_size (int32)    : Image batch size (default 32)
+  
+  Returns:
+    A 9 by 9 matplotlib pyplot images with true and prediction lables, prediction confidence percentage.
+  """
+  image_ds = tf.keras.preprocessing.image_dataset_from_directory(img_dir,
+                                                                  image_size=[img_size,img_size],
+                                                                  label_mode= "categorical",
+                                                                  batch_size = batch_size, 
+                                                                  shuffle=True)
+  # Retrieve a batch of images from the test set
+  image_batch, label_batch = image_ds.as_numpy_iterator().next()
+  predictions = model_mn.predict_on_batch(image_batch)
+
+  # Apply a softmax
+  predictions = tf.nn.softmax(predictions)
+  pred_values =  predictions
+  top_values, top_indices = tf.nn.top_k(predictions, 1)
+  predictions = np.array(tf.cast(tf.greater_equal(predictions, top_values), tf.float32))
+
+
+  lables = image_ds.class_names
+
+  plt.figure(figsize=(9,9))
+  for i in range(9):
+    true_label = lables[label_batch[i].argmax()]
+    pred_label = lables[predictions[i].argmax()]
+    pred_conf = tf.round(100 * top_values[i][0].numpy(),3)
+    correct_pred = true_label== pred_label
+    title_color = 'green' if correct_pred else 'red'
+    # Plot images
+    ax = plt.subplot(3, 3, i + 1)
+    plt.imshow(image_batch[i].astype("uint8"))  
+    if correct_pred:
+      plt.title(f"{pred_label} {pred_conf}%", fontdict={'size':10, 'color':title_color})
+    else:
+      plt.title(f"True={true_label} - pred={pred_label} {pred_conf}%", fontdict={'size':8, 'color':title_color})  
+    plt.axis("off")
+    plt.tight_layout()
