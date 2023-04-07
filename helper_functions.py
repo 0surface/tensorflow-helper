@@ -360,3 +360,31 @@ def choose_and_predict_random_images(img_dir, model, img_size=224, batch_size=32
       plt.title(f"True={true_label} - pred={pred_label} {pred_conf}%", fontdict={'size':8, 'color':title_color})  
     plt.axis("off")
     plt.tight_layout()
+    
+import os
+import random
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+def view_three_images(target_dir, target_class):
+    """
+    Randomly selects and displays 3 random images from `target_class` folder in `target_dir` folder.
+    
+    Requires target_dir to be in format:
+        target_dir
+                 |target_class_1
+                 |target_class_2
+                 |...
+                 
+    """
+    target_path = target_dir+target_class
+    file_names = os.listdir(target_path)
+    target_images = random.sample(file_names, 3)
+    
+    # Plot images
+    plt.figure(figsize=(15, 6))
+    for i, img in enumerate(target_images):
+        img_path = target_path + "/" + img
+        plt.subplot(1, 3, i+1)
+        plt.imshow(mpimg.imread(img_path))
+        plt.title(target_class)
+        plt.axis("off")
