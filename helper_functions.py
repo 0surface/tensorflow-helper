@@ -388,3 +388,29 @@ def view_three_images(target_dir, target_class):
         plt.imshow(mpimg.imread(img_path))
         plt.title(target_class)
         plt.axis("off")
+        
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+
+def evaluate_model_results(y_true, y_pred):
+  """
+  Calculates model accuracy, precision, recall and f1-score of a binary classification model
+
+  Params:
+    y_true (1d-array): array of actual values
+    y_pred (1d-array): array of predicted values
+
+  Returns:
+    A dictionary of Model accuracy, precision, recall, f1-score multiplied by 100
+  """
+  # calculate model accuracy
+  model_accuracy = accuracy_score(y_true, y_pred) * 100
+  
+  # Calculate model precision, recall and f1-scoreusing "weighted" avarage
+  # `Weighted` if there is a label imbalance, it adjusts for it
+  model_precision, model_recall, model_f1, _ =  precision_recall_fscore_support(y_true, y_pred, average ='weighted')
+
+  model_results = {"accuracy": model_accuracy,
+                   "precision": model_precision *100,
+                   "recall":model_recall *100,
+                   "f1-score":model_f1*100}
+  return  model_results
