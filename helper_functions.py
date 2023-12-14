@@ -333,7 +333,7 @@ def choose_and_predict_random_images(img_dir, model, img_size=224, batch_size=32
                                                                   shuffle=True)
   # Retrieve a batch of images from the test set
   image_batch, label_batch = image_ds.as_numpy_iterator().next()
-  predictions = model_mn.predict_on_batch(image_batch)
+  predictions = model.predict_on_batch(image_batch)
 
   # Apply a softmax
   predictions = tf.nn.softmax(predictions)
